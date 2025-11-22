@@ -6,10 +6,13 @@ when@dev:
     monolog:
         handlers:
             main:
-                type: stream
+                type: rotating_file
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
                 channels: ["!event"]
+                max_files: 14
+                date_format: 'Y-m-d'
+                filename_format: '{filename}-{date}.log'
             console:
                 type: console
                 process_psr_3_messages: false
@@ -40,9 +43,12 @@ when@prod:
                 channels: ["!deprecation"]
                 buffer_size: 50 # How many messages should be saved? Prevent memory leaks
             nested:
-                type: stream
-                path: php://stderr
+                type: rotating_file
+                path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
+                max_files: 30
+                date_format: 'Y-m-d'
+                filename_format: '{filename}-{date}.log'
                 formatter: monolog.formatter.json
             console:
                 type: console

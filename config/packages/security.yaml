@@ -12,7 +12,6 @@ security:
         api:
             pattern: ^/api
             stateless: false
-            session: true
             lazy: true
         main:
             lazy: true
