@@ -13,7 +13,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * Command to collect server metrics via SSH and store them in the database.
@@ -28,8 +27,7 @@ class CollectMetricsCommand extends Command
     public function __construct(
         private readonly SshMetricsCollector $sshMetricsCollector,
         private readonly EntityManagerInterface $entityManager,
-        private readonly LoggerInterface $logger,
-        private readonly ParameterBagInterface $parameterBag
+        private readonly LoggerInterface $logger
     ) {
         parent::__construct();
     }
@@ -39,10 +37,10 @@ class CollectMetricsCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // Get SSH configuration from environment
-        $host = $this->parameterBag->get('env(SSH_HOST)');
-        $port = (int) ($this->parameterBag->get('env(SSH_PORT)') ?? 22);
-        $username = $this->parameterBag->get('env(SSH_USERNAME)');
-        $privateKeyBase64 = $this->parameterBag->get('env(SSH_PRIVATE_KEY)');
+        $host = $_ENV['SSH_HOST'] ?? null;
+        $port = (int) ($_ENV['SSH_PORT'] ?? 22);
+        $username = $_ENV['SSH_USERNAME'] ?? null;
+        $privateKeyBase64 = $_ENV['SSH_PRIVATE_KEY'] ?? null;
 
         // Validate required parameters
         if (empty($host) || empty($username) || empty($privateKeyBase64)) {
