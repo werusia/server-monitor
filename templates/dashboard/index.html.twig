@@ -1,0 +1,145 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - Server Monitor{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block body %}
+    <div class="dashboard-container">
+        {# StickyHeader #}
+        <header class="sticky-top bg-white shadow-sm py-3 mb-3" id="dashboard-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    {# Left side: TimeRangeSelector and LoadingSpinner #}
+                    <div class="d-flex align-items-center gap-3">
+                        {# TimeRangeSelector #}
+                        <div class="btn-group" role="group" aria-label="Wybierz zakres czasowy" id="time-range-selector">
+                            <button type="button" class="btn btn-outline-primary" data-range="1h" aria-label="1 godzina">1h</button>
+                            <button type="button" class="btn btn-outline-primary" data-range="6h" aria-label="6 godzin">6h</button>
+                            <button type="button" class="btn btn-outline-primary active" data-range="24h" aria-label="24 godziny">24h</button>
+                            <button type="button" class="btn btn-outline-primary" data-range="7d" aria-label="7 dni">7d</button>
+                            <button type="button" class="btn btn-outline-primary" data-range="30d" aria-label="30 dni">30d</button>
+                        </div>
+                        
+                        {# LoadingSpinner #}
+                        <div class="spinner-border spinner-border-sm text-primary d-none" role="status" id="loading-spinner">
+                            <span class="visually-hidden">Ładowanie...</span>
+                        </div>
+                    </div>
+
+                    {# Right side: RefreshButton and LogoutButton #}
+                    <div class="d-flex align-items-center gap-2">
+                        {# RefreshButton #}
+                        <button type="button" class="btn btn-primary" id="refresh-button" aria-label="Odśwież dane">
+                            <i class="bi bi-arrow-clockwise"></i> Odśwież
+                        </button>
+                        
+                        {# LogoutButton #}
+                        <button type="button" class="btn btn-outline-secondary" id="logout-button" aria-label="Wyloguj">
+                            <i class="bi bi-box-arrow-right"></i> Wyloguj
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        {# AlertBanner - warunkowy #}
+        <div class="container-fluid mb-3" id="alert-banner-container" style="display: none;">
+            <div class="alert alert-dismissible fade show" role="alert" id="alert-banner">
+                <span id="alert-message"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
+            </div>
+        </div>
+
+        {# MetricsSections #}
+        <div class="container-fluid" id="metrics-sections">
+            {# CPUMetricSection #}
+            <section class="mb-5" id="cpu-metric-section">
+                <div class="d-flex align-items-center mb-3">
+                    <h2 class="mb-0 me-2">Wykorzystanie CPU</h2>
+                    <span class="text-muted">%</span>
+                    <i class="bi bi-exclamation-triangle-fill text-warning d-none ms-2" id="cpu-warning-icon" data-bs-toggle="tooltip" data-bs-placement="top" title=""></i>
+                </div>
+                <div class="chart-container" style="min-height: 300px; position: relative;">
+                    <canvas id="cpu-chart"></canvas>
+                    <div class="d-none text-center text-muted align-items-center justify-content-center" id="cpu-no-data" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <p class="mb-0">Brak danych</p>
+                    </div>
+                </div>
+            </section>
+
+            {# RAMMetricSection #}
+            <section class="mb-5" id="ram-metric-section">
+                <div class="d-flex align-items-center mb-3">
+                    <h2 class="mb-0 me-2">Wykorzystanie RAM</h2>
+                    <div class="btn-group btn-group-sm ms-2" role="group" aria-label="Wybierz jednostkę RAM" id="ram-unit-toggle">
+                        <button type="button" class="btn btn-outline-secondary active" data-unit="GB">GB</button>
+                        <button type="button" class="btn btn-outline-secondary" data-unit="MB">MB</button>
+                    </div>
+                    <i class="bi bi-exclamation-triangle-fill text-warning d-none ms-2" id="ram-warning-icon" data-bs-toggle="tooltip" data-bs-placement="top" title=""></i>
+                </div>
+                <div class="chart-container" style="min-height: 300px; position: relative;">
+                    <canvas id="ram-chart"></canvas>
+                    <div class="d-none text-center text-muted align-items-center justify-content-center" id="ram-no-data" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <p class="mb-0">Brak danych</p>
+                    </div>
+                </div>
+            </section>
+
+            {# DiskMetricSection #}
+            <section class="mb-5" id="disk-metric-section">
+                <div class="d-flex align-items-center mb-3">
+                    <h2 class="mb-0 me-2">Wykorzystanie dysku</h2>
+                    <span class="text-muted">GB</span>
+                    <i class="bi bi-exclamation-triangle-fill text-warning d-none ms-2" id="disk-warning-icon" data-bs-toggle="tooltip" data-bs-placement="top" title=""></i>
+                </div>
+                <div class="chart-container" style="min-height: 300px; position: relative;">
+                    <canvas id="disk-chart"></canvas>
+                    <div class="d-none text-center text-muted align-items-center justify-content-center" id="disk-no-data" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <p class="mb-0">Brak danych</p>
+                    </div>
+                </div>
+            </section>
+
+            {# IOMetricSection #}
+            <section class="mb-5" id="io-metric-section">
+                <div class="d-flex align-items-center mb-3">
+                    <h2 class="mb-0 me-2">Aktywność I/O</h2>
+                    <span class="text-muted">Bajty</span>
+                    <i class="bi bi-exclamation-triangle-fill text-warning d-none ms-2" id="io-warning-icon" data-bs-toggle="tooltip" data-bs-placement="top" title=""></i>
+                </div>
+                <div class="chart-container" style="min-height: 300px; position: relative;">
+                    <canvas id="io-chart"></canvas>
+                    <div class="d-none text-center text-muted align-items-center justify-content-center" id="io-no-data" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <p class="mb-0">Brak danych</p>
+                    </div>
+                </div>
+            </section>
+
+            {# NetworkMetricSection #}
+            <section class="mb-5" id="network-metric-section">
+                <div class="d-flex align-items-center mb-3">
+                    <h2 class="mb-0 me-2">Ruch sieciowy</h2>
+                    <span class="text-muted" id="network-unit">MB/s</span>
+                    <i class="bi bi-exclamation-triangle-fill text-warning d-none ms-2" id="network-warning-icon" data-bs-toggle="tooltip" data-bs-placement="top" title=""></i>
+                </div>
+                <div class="chart-container" style="min-height: 300px; position: relative;">
+                    <canvas id="network-chart"></canvas>
+                    <div class="d-none text-center text-muted align-items-center justify-content-center" id="network-no-data" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <p class="mb-0">Brak danych</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+{% endblock %}
+

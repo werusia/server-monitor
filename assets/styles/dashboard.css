@@ -1,0 +1,84 @@
+/* Dashboard styles */
+
+.dashboard-container {
+    padding-bottom: 2rem;
+}
+
+/* Chart container responsive styles */
+.chart-container {
+    min-height: 300px;
+    position: relative;
+    width: 100%;
+}
+
+/* Responsive chart heights */
+@media (max-width: 768px) {
+    .chart-container {
+        min-height: 250px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .chart-container {
+        min-height: 400px;
+        max-height: 500px;
+    }
+}
+
+/* Sticky header adjustments */
+#dashboard-header {
+    z-index: 1020;
+}
+
+/* Metric section spacing */
+#metrics-sections section {
+    margin-bottom: 3rem;
+}
+
+/* Warning icon spacing */
+.bi-exclamation-triangle-fill {
+    font-size: 1.2rem;
+}
+
+/* No data message styling */
+#metrics-sections [id$="-no-data"] {
+    font-size: 1.1rem;
+    color: #6c757d;
+}
+
+/* Responsive button group for time range selector */
+@media (max-width: 576px) {
+    #time-range-selector {
+        flex-wrap: wrap;
+    }
+    
+    #time-range-selector .btn {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Responsive header layout */
+@media (max-width: 768px) {
+    #dashboard-header .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    #dashboard-header .d-flex > div:first-child {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    #dashboard-header .d-flex > div:last-child {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Chart canvas responsive */
+canvas {
+    max-width: 100%;
+    height: auto !important;
+}
+

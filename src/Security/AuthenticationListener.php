@@ -70,8 +70,20 @@ class AuthenticationListener implements EventSubscriberInterface
             return false;
         }
 
-        $session = $request->getSession();
-        if (!$session->has(self::SESSION_AUTH_KEY)) {
+        try {
+            // Get session - Symfony will create it if it doesn't exist
+            $session = $request->getSession();
+            
+            // Start session if not already started
+            if (!$session->isStarted()) {
+                $session->start();
+            }
+
+            if (!$session->has(self::SESSION_AUTH_KEY)) {
+                return false;
+            }
+        } catch (\Exception $e) {
+            // Session not available
             return false;
         }
 

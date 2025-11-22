@@ -27,7 +27,7 @@ class LoginController extends AbstractController
     {
         // Check if already authenticated
         if ($this->isAuthenticated($request->getSession())) {
-            return $this->redirect('/');
+            return $this->redirect('/dashboard');
         }
 
         // Check for expired session parameter
@@ -99,9 +99,14 @@ class LoginController extends AbstractController
         // Set authenticated session
         $session->set(self::SESSION_AUTH_KEY, true);
         $session->set('auth_time', time());
+        
+        // Ensure session is started and will be saved
+        if (!$session->isStarted()) {
+            $session->start();
+        }
 
-        // Redirect to home page
-        return $this->redirect('/');
+        // Redirect to dashboard - Symfony will automatically save session and set cookie
+        return $this->redirect('/dashboard');
     }
 
     private function isAuthenticated(SessionInterface $session): bool

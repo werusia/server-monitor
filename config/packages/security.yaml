@@ -19,10 +19,11 @@ security:
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
+    # Note: /api/* authentication is handled by AuthenticationListener, not Symfony Security
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api, roles: PUBLIC_ACCESS }  # Authentication handled by custom AuthenticationListener
 
 when@test:
     security:
