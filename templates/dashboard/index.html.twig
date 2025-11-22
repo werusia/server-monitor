@@ -14,7 +14,15 @@
         <header class="sticky-top bg-white shadow-sm py-3 mb-3" id="dashboard-header">
             <div class="container-fluid">
                 <div class="d-flex justify-content-between align-items-center">
-                    {# Left side: TimeRangeSelector and LoadingSpinner #}
+                    {# Left side: Branding/Title #}
+                    <div class="d-flex align-items-center">
+                        <div class="header-brand">
+                            <i class="bi bi-server me-2"></i>
+                            <span class="header-title">Server Monitor</span>
+                        </div>
+                    </div>
+
+                    {# Center: TimeRangeSelector and LoadingSpinner #}
                     <div class="d-flex align-items-center gap-3">
                         {# TimeRangeSelector #}
                         <div class="btn-group" role="group" aria-label="Wybierz zakres czasowy" id="time-range-selector">

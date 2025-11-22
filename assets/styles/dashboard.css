@@ -19,15 +19,258 @@
 /* Modern header styling */
 #dashboard-header {
     z-index: 1020;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(102, 126, 234, 0.05) 100%) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.12), 
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border-bottom: 2px solid;
+    border-image: linear-gradient(90deg, 
+        rgba(102, 126, 234, 0.3) 0%, 
+        rgba(118, 75, 162, 0.3) 50%, 
+        rgba(102, 126, 234, 0.3) 100%) 1;
     transition: var(--transition-smooth);
+    position: sticky !important;
+    top: 0 !important;
+    overflow: hidden;
+    padding: 1rem 0 !important;
+}
+
+#dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent);
+    animation: shimmer 3s infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+#dashboard-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-gradient);
+    opacity: 0.6;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: headerLine 1.5s ease-out 0.5s forwards;
+}
+
+@keyframes headerLine {
+    to {
+        transform: scaleX(1);
+    }
 }
 
 #dashboard-header:hover {
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.18), 
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    transform: translateY(0);
+}
+
+#dashboard-header .container-fluid {
+    position: relative;
+    z-index: 1;
+}
+
+/* Enhanced header content styling */
+#dashboard-header .d-flex {
+    position: relative;
+}
+
+/* Add subtle glow to time range buttons in header */
+#dashboard-header #time-range-selector .btn {
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+#dashboard-header #time-range-selector .btn.active {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Enhanced refresh button in header */
+#dashboard-header #refresh-button {
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35),
+                0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+#dashboard-header #refresh-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+#dashboard-header #refresh-button:hover::after {
+    width: 400px;
+    height: 400px;
+}
+
+/* Enhanced logout button in header */
+#dashboard-header #logout-button {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0.75rem 1.5rem;
+    border-width: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+#dashboard-header #logout-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(108, 117, 125, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+#dashboard-header #logout-button:hover::before {
+    left: 100%;
+}
+
+/* Loading spinner enhancement in header */
+#dashboard-header #loading-spinner {
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+    border-width: 3px;
+}
+
+/* Fancy header branding */
+.header-brand {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    position: relative;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    transition: var(--transition-smooth);
+    cursor: default;
+}
+
+.header-brand::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0.75rem;
+    padding: 2px;
+    background: var(--primary-gradient);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: var(--transition-smooth);
+}
+
+.header-brand:hover::before {
+    opacity: 1;
+}
+
+.header-brand:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+}
+
+.header-brand .bi-server {
+    font-size: 1.75rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.header-title {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive header adjustments */
+@media (max-width: 992px) {
+    #dashboard-header .d-flex {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .header-brand {
+        font-size: 1.25rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .header-brand .bi-server {
+        font-size: 1.5rem;
+    }
+    
+    #dashboard-header .d-flex > div:first-child {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    #dashboard-header .d-flex > div:nth-child(2) {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    #dashboard-header .d-flex > div:last-child {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Modern button styles */
@@ -272,21 +515,6 @@
 
 /* Responsive header layout */
 @media (max-width: 768px) {
-    #dashboard-header .d-flex {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    #dashboard-header .d-flex > div:first-child {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    #dashboard-header .d-flex > div:last-child {
-        width: 100%;
-        justify-content: center;
-    }
-    
     #metrics-sections section {
         padding: 1.5rem;
     }
