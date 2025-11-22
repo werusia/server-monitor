@@ -1,3 +1,103 @@
 ---
 alwaysApply: true
 ---
+# Guidelines for Symfony
+
+## Symfony Coding Standards
+
+* **Prefer modern PHP & Symfony features**: use PHP 8.1+ (typed properties, `readonly`, enums, union types) and Symfony 6+ conventions.
+* **Use controllers as thin HTTP adapters**: keep business logic in services (application/domain layer). Controllers should validate input, call services, and return responses.
+* **Autowire and favor constructor injection** for services. Avoid fetching services from the container inside methods.
+* **Use Attributes (or annotations consistently)** for routing, validation groups, and security only if your project standard uses them.
+* **Keep services single-responsibility** and name them clearly (e.g., `UserRegistrationService`, `PaymentProcessor`).
+* **Prefer typed method signatures** (argument and return types) everywhere.
+* **Avoid `new` for domain services** in controllers — inject factories or services instead.
+
+## Key Principles
+
+* **Separation of concerns**: HTTP layer (controllers), application layer (use-cases), domain (entities, domain services), infrastructure (doctrine, queues, external APIs).
+* **Explicit is better than implicit**: prefer explicit DTOs and value objects over associative arrays where clarity matters.
+* **Prefer immutability in domain models** where practical (value objects, readonly properties).
+* **Descriptive naming**: use boolean prefixes `is`, `has` (`isActive`, `hasPermission`).
+* **Fail fast and be explicit with exceptions**: throw meaningful exceptions and map them to HTTP responses centrally.
+
+## File / Project Structure (recommended)
+
+```
+config/
+src/
+  Controller/
+  Service/
+  Repository/
+  Entity/
+  DTO/
+  Form/
+  Event/
+  Message/
+  Security/
+  Migrations/
+templates/
+translations/
+public/
+tests/
+```
+
+Order inside PHP files: `declare(strict_types=1)`, namespace, use statements, class docblock, constants, properties, constructor, public API, protected, private helpers, magic methods last.
+
+## Controllers
+
+* Keep controllers minimal; delegate work to services.
+* Return `JsonResponse`, `Response`, or `RedirectResponse` as appropriate.
+* Use `ParamConverter` sparingly — prefer explicit fetching and typed DTOs for complex input.
+
+## Routing
+
+* Keep routing centralized in `config/routes/*.yaml` or use attributes consistently.
+* Prefer route names that reflect intent: `app.user.register` not `user_register`.
+* Limit route responsibilities; one route → one controller action.
+
+## Dependency Injection & Services
+
+* Define interfaces for important services and type-hint those in constructors.
+* Use autowiring + autoconfigure in `services.yaml`.
+* For multiple implementations, use named autowiring (service aliases, `bind`, or `tagged_iterator`).
+* Keep service constructors small — avoid long parameter lists; use factories when needed.
+
+## Doctrine, Entities & Repositories
+
+* Entities are domain objects — keep logic there when it belongs to the domain.
+* Use repository classes for persistence queries; keep complex queries in custom repository methods.
+* Prefer explicit DQL or QueryBuilder over raw SQL unless necessary.
+* Use migrations (Doctrine Migrations) and keep them in version control.
+* Avoid lazy-loading traps in UIs (N+1) — profile with the Doctrine dev tools and optimize with joins.
+
+## Templates (Twig)
+
+* Keep templates lean: presentation logic only. Complex logic belongs in services or Twig extensions.
+* Use components/blocks for reusable UI pieces.
+* Escape all output by default and use `|raw` only when output is known safe.
+* Use `trans` for translations.
+
+## Caching & Performance
+
+* Use HTTP caching (Cache-Control, ETags) and reverse-proxy (Varnish) or CDN where it makes sense.
+* Use Symfony HttpCache/Edge Side Includes (ESI) for fragment caching.
+* Cache expensive computed data (Redis / Cache component) and invalidate thoughtfully.
+* Profile with the Symfony Profiler and Blackfire when needed.
+
+## Logging & Error
+* Use Monolog with appropriate channels and levels.
+
+* Capture exceptions centrally (exception listener) and convert them to user-friendly responses.
+
+* Do not leak sensitive information in error messages.
+
+## Testing
+
+* Unit tests with PHPUnit for services and domain logic.
+
+## Static Analysis & Quality Tools
+
+Enforce PSR-12 coding style with php-cs-fixer or ecs.
+
+Use PHPStan for static analysis; fix issues before merging.
