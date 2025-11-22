@@ -1,0 +1,103 @@
+/* Login page styles */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-container .container {
+    width: 100%;
+}
+
+.login-container .card {
+    border: none;
+    border-radius: 1rem;
+    background: white;
+}
+
+.login-container .card-body {
+    border-radius: 1rem;
+}
+
+.login-container header h1 {
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login-container .alert {
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.login-container .form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.login-container .form-control {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.login-container .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.login-container .form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.login-container .invalid-feedback {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+}
+
+.login-container .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-container .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.login-container .btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .login-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .login-container .card-body {
+        padding: 1.5rem !important;
+    }
+
+    .login-container header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .login-container .card {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+}
+

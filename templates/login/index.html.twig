@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Logowanie - Server Monitor{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+{% endblock %}
+
+{% block body %}
+    <div class="login-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                    {# Header Section #}
+                    <header class="text-center mb-4">
+                        <h1 class="h2 mb-0">Server Monitor</h1>
+                    </header>
+
+                    {# Alert Section - Expired Session #}
+                    {% if expired %}
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <strong>Informacja:</strong> Sesja wygasła. Zaloguj się ponownie, aby kontynuować.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
+                        </div>
+                    {% endif %}
+
+                    {# Alert Section - Login Error #}
+                    {% if error %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="login-error">
+                            <strong>Błąd:</strong> {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
+                        </div>
+                    {% endif %}
+
+                    {# Login Form #}
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            {{ form_start(form, {
+                                'attr': {
+                                    'novalidate': 'novalidate',
+                                    'class': 'login-form',
+                                    'id': 'login-form',
+                                    'data-turbo': 'false'
+                                }
+                            }) }}
+
+                            {# Password Input Group #}
+                            <div class="mb-3">
+                                {{ form_label(form.password, null, {
+                                    'label_attr': {
+                                        'class': 'form-label',
+                                        'for': 'login_form_password'
+                                    }
+                                }) }}
+                                {{ form_widget(form.password, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (error ? ' is-invalid' : ''),
+                                        'id': 'login_form_password',
+                                        'autofocus': true,
+                                        'aria-describedby': error ? 'login-error' : null
+                                    }
+                                }) }}
+                                {% if error %}
+                                    <div class="invalid-feedback" role="alert">
+                                        {{ error }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {# Submit Button Group #}
+                            <div class="d-grid">
+                                {{ form_widget(form.submit, {
+                                    'attr': {
+                                        'class': 'btn btn-primary btn-lg',
+                                        'id': 'login-submit-button'
+                                    }
+                                }) }}
+                            </div>
+
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+{% endblock %}
+
