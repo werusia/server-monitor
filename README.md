@@ -196,13 +196,47 @@ ddev exec php bin/phpunit
 
 #### End-to-End Tests (Cypress)
 
-Run E2E tests:
+**Configuration:**
+
+Before running E2E tests, you need to configure the test password. The password can be set in one of the following ways (in order of priority):
+
+1. **Environment variable** (recommended for CI/CD):
+   ```bash
+   APP_PASSWORD=your-password npm run test:e2e
+   ```
+
+2. **`.env.local` file** (recommended for local development):
+   ```env
+   APP_PASSWORD=your-password
+   ```
+
+3. **`cypress.env.json` file** (alternative for local development):
+   ```json
+   {
+     "APP_PASSWORD": "your-password"
+   }
+   ```
+   
+   You can copy the example file:
+   ```bash
+   cp cypress.env.example.json cypress.env.json
+   # Then edit cypress.env.json with your password
+   ```
+
+**Note:** The `cypress.env.json` file is already in `.gitignore` and will not be committed to version control.
+
+**Running Tests:**
+
 ```bash
-# Run tests in headless mode
-npx cypress run
+# Run all E2E tests in headless mode
+npm run test:e2e
 
 # Open Cypress Test Runner (interactive)
-npx cypress open
+npm run test:e2e:open
+
+# Run in specific browser
+npm run test:e2e:chrome
+npm run test:e2e:firefox
 ```
 
 **E2E Test Coverage:**
@@ -243,42 +277,9 @@ npx cypress open
 - Only works with Linux servers that have `/proc` filesystem
 - Framework: Symfony 7.3 with minimal bundles (console, doctrine/orm, security, twig)
 
-### Current Implementation Status
-
-- ✅ SSH metric collection
-- ✅ Database storage with Doctrine ORM
-- ✅ Web dashboard with Chart.js
-- ✅ Password authentication
-- ✅ Automated data cleanup
-- ✅ Error handling and logging
-- ✅ Responsive design
-
-### Future Considerations
-
-Potential enhancements for future versions (not in current scope):
-- Multi-server support
-- Alerting system
-- Data export capabilities
-- REST API
-- Advanced user management
-- Caching for improved performance
-- Auto-refresh dashboard option
-
 ## License
 
 This project is proprietary. See `composer.json` for license information.
-
-## Additional Documentation
-
-For detailed product requirements and specifications, refer to:
-- `.ai/prd.md` - Product Requirements Document (in Polish)
-- `.ai/tech-stack.md` - Technology stack details
-- `.ai/api-plan.md` - API planning documentation
-- `.ai/test-plan.md` - Comprehensive testing plan (in Polish)
-
-## Support
-
-For issues, questions, or contributions, please refer to the project's issue tracker or contact the development team.
 
 ---
 

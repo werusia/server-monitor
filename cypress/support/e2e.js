@@ -1,0 +1,37 @@
+// ***********************************************************
+// This example support/e2e.js is processed and
+// loaded automatically before your test files.
+//
+// This is a great place to put global configuration and
+// behavior that modifies Cypress.
+//
+// You can change the location of this file or turn off
+// automatically serving support files with the
+// 'supportFile' configuration option.
+//
+// You can read more here:
+// https://on.cypress.io/configuration
+// ***********************************************************
+
+// Handle uncaught exceptions
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // returning false here prevents Cypress from
+  // failing the test
+  // Uncomment the line below if you want to ignore specific errors
+  // if (err.message.includes('ResizeObserver loop limit exceeded')) {
+  //   return false;
+  // }
+  // we want to fail the test for other errors
+  return true;
+});
+
+// Clear cookies and local storage before each test
+beforeEach(() => {
+  cy.clearCookies();
+  cy.clearLocalStorage();
+  // Clear sessionStorage manually (Cypress doesn't have cy.clearSessionStorage())
+  cy.window().then((win) => {
+    win.sessionStorage.clear();
+  });
+});
+

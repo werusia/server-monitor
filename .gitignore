@@ -38,6 +38,8 @@
 # PHPUnit
 /app/phpunit.xml
 /phpunit.xml
+.phpunit.cache/
+var/coverage/
 
 # Build data
 /build/
@@ -52,3 +54,14 @@
 /.web-server-pid
 .env
 .idea/
+
+# Node.js
+node_modules/
+package-lock.json
+yarn.lock
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+cypress.env.json
