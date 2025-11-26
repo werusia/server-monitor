@@ -85,7 +85,11 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "test": "phpunit",
+        "test:unit": "phpunit --testsuite=Unit",
+        "test:integration": "phpunit --testsuite=Integration",
+        "test:coverage": "phpunit --coverage-html var/coverage"
     },
     "conflict": {
         "symfony/symfony": "*"

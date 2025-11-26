@@ -6,4 +6,9 @@ Database: MySQL 8.0+
 PHP: 8.3
 CSS: Bootstrap 5
 Logging: Monolog
-```
+
+Testing:
+- Unit & Integration Tests: PHPUnit ^12.4
+- E2E Tests: Cypress
+- Static Analysis: PHPStan / Psalm
+- Code Style: PHP CS Fixer

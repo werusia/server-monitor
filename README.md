@@ -33,7 +33,11 @@ The application consists of two main components:
 - **CSS Framework**: Bootstrap 5
 - **SSH Library**: phpseclib/phpseclib ^3.0
 - **Logging**: Monolog
-- **Testing**: PHPUnit ^12.4
+- **Testing**: 
+  - **Unit & Integration Tests**: PHPUnit ^12.4
+  - **E2E Tests**: Cypress
+  - **Static Analysis**: PHPStan / Psalm
+  - **Code Style**: PHP CS Fixer
 - **ORM**: Doctrine ORM ^3.5
 
 ## Getting Started Locally
@@ -172,6 +176,46 @@ The following scripts are automatically executed after `composer install` and `c
 - `assets:install`: Installs assets to the public directory
 - `importmap:install`: Installs JavaScript dependencies via importmap
 
+### Testing
+
+The project includes comprehensive test coverage using multiple testing tools:
+
+#### Unit and Integration Tests (PHPUnit)
+
+Run all PHPUnit tests:
+```bash
+ddev exec php bin/phpunit
+```
+
+**Test Coverage:**
+- Unit tests for services, controllers, repositories, and commands
+- Integration tests for database operations and SSH connections
+- Functional tests for API endpoints and authentication
+- Uses Symfony Test Client for HTTP testing
+- Separate test database for isolated testing
+
+#### End-to-End Tests (Cypress)
+
+Run E2E tests:
+```bash
+# Run tests in headless mode
+npx cypress run
+
+# Open Cypress Test Runner (interactive)
+npx cypress open
+```
+
+**E2E Test Coverage:**
+- User login and authentication flows
+- Dashboard interactions (time range switching, data refresh)
+- Error handling scenarios
+- Responsive design verification
+
+#### Code Quality Tools
+
+- **PHPStan / Psalm**: Static code analysis for detecting potential bugs
+- **PHP CS Fixer**: Automated code style formatting to maintain consistency
+
 ### Other Useful Commands
 
 ```bash
@@ -186,6 +230,10 @@ ddev exec php bin/console cache:clear
 
 # Run tests
 ddev exec php bin/phpunit
+
+# Run E2E tests (requires Node.js and Cypress)
+npx cypress run
+npx cypress open
 ```
 
 ### Technical Limitations
@@ -226,6 +274,7 @@ For detailed product requirements and specifications, refer to:
 - `.ai/prd.md` - Product Requirements Document (in Polish)
 - `.ai/tech-stack.md` - Technology stack details
 - `.ai/api-plan.md` - API planning documentation
+- `.ai/test-plan.md` - Comprehensive testing plan (in Polish)
 
 ## Support
 

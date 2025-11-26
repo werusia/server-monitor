@@ -1,0 +1,63 @@
+---
+alwaysApply: true
+---
+
+# PHPUnit Unit Testing Guidelines
+
+## Test Structure
+
+* **Test class naming**: `{ClassName}Test.php` in `tests/Unit/` mirroring `src/` structure
+* **Test method naming**: `test{MethodName}{Scenario}` or use `#[Test]` attribute with descriptive method names
+* **One assertion per test** when possible; group related assertions logically
+* **Use `declare(strict_types=1)`** at the top of test files
+* **Arrange-Act-Assert (AAA)** pattern: setup → execute → verify
+
+## Isolation & Dependencies
+
+* **Unit tests must be isolated**: no database, no file system, no network calls
+* **Mock all external dependencies**: use `createMock()`, `createStub()`, or `createConfiguredMock()`
+* **Use dependency injection**: inject mocks via constructor, not service locator
+* **Avoid static calls**: prefer instance methods or inject static dependencies as services
+* **Test one class at a time**: focus on the class under test, mock collaborators
+
+## PHPUnit 12.4 Features
+
+* **Use attributes**: `#[Test]`, `#[DataProvider]`, `#[BeforeEach]`, `#[AfterEach]` instead of method name prefixes
+* **Type-safe assertions**: prefer typed assertions (`assertSame()` over `assertEquals()`)
+* **Custom assertions**: create helper methods for domain-specific assertions
+* **Data providers**: use `#[DataProvider]` for testing multiple scenarios
+
+## Assertions
+
+* **Prefer specific assertions**: `assertSame()`, `assertInstanceOf()`, `assertCount()` over generic `assertTrue()`
+* **Test exceptions**: use `expectException()`, `expectExceptionMessage()`, `expectExceptionCode()`
+* **Test return types**: verify return types match method signatures
+* **Assert edge cases**: null, empty, boundary values, invalid inputs
+
+## Mocking Best Practices
+
+* **Mock interfaces when possible**: easier to verify and maintain
+* **Use `willReturn()`, `willReturnCallback()`, `willThrowException()`** for mock behavior
+* **Verify interactions**: use `expects()` only when interaction verification is necessary
+* **Avoid over-mocking**: test real behavior when dependencies are simple value objects
+
+## Test Organization
+
+* **Group related tests**: use `#[Group]` attribute or separate test classes
+* **Keep tests small**: one scenario per test method
+* **Use descriptive test names**: clearly state what is being tested and expected outcome
+* **Extract common setup**: use `setUp()` method or traits for shared initialization
+
+## Symfony-Specific
+
+* **Test services in isolation**: use `new ServiceClass()` with mocked dependencies, not container
+* **Use Symfony test doubles**: `Symfony\Component\Mailer\Test\Constraint\EmailIsQueued` for mailer, etc.
+* **Avoid KernelTestCase for unit tests**: use `TestCase` base class
+* **Mock EntityManager/Repository**: don't use real Doctrine in unit tests
+
+## Code Quality
+
+* **Tests are production code**: maintain same quality standards (PSR-12, type hints)
+* **Keep tests readable**: use helper methods, descriptive variable names
+* **Avoid test interdependencies**: tests should run in any order
+* **Fast execution**: unit tests must run quickly (< 1 second per test)
