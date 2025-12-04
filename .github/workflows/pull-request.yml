@@ -170,25 +170,21 @@ jobs:
               ? '✅ All checks passed' 
               : '❌ Some checks failed';
 
-            const body = `## Pull Request Checks Status
+            const e2eCoverageLine = e2eTestStatus === '✅' ? '- **E2E Test Coverage**: Available in artifacts (cypress-videos)' : '';
 
-${overallStatus}
-
-### Test Results
-
-| Check | Status |
-|-------|--------|
-| Code Linting | ${lintStatus} |
-| Unit Tests | ${unitTestStatus} |
-| E2E Tests | ${e2eTestStatus} |
-
-### Coverage Reports
-
-- **Unit Test Coverage**: Available in artifacts (unit-test-coverage)
-${e2eTestStatus === '✅' ? '- **E2E Test Coverage**: Available in artifacts (cypress-videos)' : ''}
-
----
-*This comment will be updated automatically on each push.*`;
+            const body = '## Pull Request Checks Status\n\n' +
+              overallStatus + '\n\n' +
+              '### Test Results\n\n' +
+              '| Check | Status |\n' +
+              '|-------|--------|\n' +
+              '| Code Linting | ' + lintStatus + ' |\n' +
+              '| Unit Tests | ' + unitTestStatus + ' |\n' +
+              '| E2E Tests | ' + e2eTestStatus + ' |\n\n' +
+              '### Coverage Reports\n\n' +
+              '- **Unit Test Coverage**: Available in artifacts (unit-test-coverage)\n' +
+              e2eCoverageLine + '\n\n' +
+              '---\n' +
+              '*This comment will be updated automatically on each push.*';
 
             if (botComment) {
               await github.rest.issues.updateComment({
