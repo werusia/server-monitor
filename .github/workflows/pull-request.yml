@@ -1,0 +1,209 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+
+env:
+  PHP_VERSION: '8.3'
+  NODE_VERSION: '20'
+
+jobs:
+  lint:
+    name: Code Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql
+          coverage: none
+          tools: composer
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run PHP CS Fixer (dry-run)
+        uses: docker://oskarstark/php-cs-fixer-ga:3.26.0
+        with:
+          args: --dry-run --diff --verbose
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npx eslint cypress/ assets/ --ext .js,.jsx
+
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql
+          coverage: xdebug
+          tools: composer
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run PHPUnit Unit Tests with Coverage
+        run: composer test:unit -- --coverage-clover=var/coverage/clover.xml --coverage-html=var/coverage/html
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-coverage
+          path: |
+            var/coverage/clover.xml
+            var/coverage/html/
+
+  e2e-test:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    environment: integration
+    env:
+      APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+      DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Run Cypress E2E Tests
+        uses: cypress-io/github-action@v6
+        with:
+          install: false
+          wait-on: 'https://server-monitor.ddev.site:33003'
+          wait-on-timeout: 120
+          browser: chrome
+          headless: true
+          env: |
+            APP_PASSWORD=${{ secrets.APP_PASSWORD || secrets.DASHBOARD_PASSWORD }}
+            DASHBOARD_PASSWORD=${{ secrets.DASHBOARD_PASSWORD || secrets.APP_PASSWORD }}
+
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          retention-days: 7
+
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          retention-days: 7
+
+      # Note: Cypress code coverage requires additional setup with @cypress/code-coverage
+      # To enable coverage, install: npm install --save-dev @cypress/code-coverage nyc
+      # and configure it in cypress.config.js and cypress/support/e2e.js
+
+  status-comment:
+    name: PR Status Comment
+    runs-on: ubuntu-latest
+    needs: [lint, unit-test, e2e-test]
+    if: always() && (needs.lint.result == 'success' && needs.unit-test.result == 'success' && needs.e2e-test.result == 'success')
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download unit test coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: unit-test-coverage
+          path: var/coverage/
+
+      - name: Create status comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('## Pull Request Checks Status')
+            );
+
+            const lintStatus = '${{ needs.lint.result }}' === 'success' ? '✅' : '❌';
+            const unitTestStatus = '${{ needs.unit-test.result }}' === 'success' ? '✅' : '❌';
+            const e2eTestStatus = '${{ needs.e2e-test.result }}' === 'success' ? '✅' : '❌';
+            
+            const overallStatus = (lintStatus === '✅' && unitTestStatus === '✅' && e2eTestStatus === '✅') 
+              ? '✅ All checks passed' 
+              : '❌ Some checks failed';
+
+            const body = `## Pull Request Checks Status
+
+${overallStatus}
+
+### Test Results
+
+| Check | Status |
+|-------|--------|
+| Code Linting | ${lintStatus} |
+| Unit Tests | ${unitTestStatus} |
+| E2E Tests | ${e2eTestStatus} |
+
+### Coverage Reports
+
+- **Unit Test Coverage**: Available in artifacts (unit-test-coverage)
+${e2eTestStatus === '✅' ? '- **E2E Test Coverage**: Available in artifacts (cypress-videos)' : ''}
+
+---
+*This comment will be updated automatically on each push.*`;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+

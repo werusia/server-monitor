@@ -1,7 +1,6 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
-
 # PHPUnit Unit Testing Guidelines
 
 ## Test Structure
