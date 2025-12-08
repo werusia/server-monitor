@@ -163,7 +163,7 @@ class SshMetricsCollector
         // For simplicity, we'll use load_avg * 100 (assuming single core or normalized)
         // In production, you might want to get actual CPU count
         $loadAvg = (float) $parts[0];
-        
+
         // Get number of CPU cores
         $cpuInfo = $ssh->exec('nproc');
         $cores = $cpuInfo !== false ? (int) trim($cpuInfo) : 1;
@@ -206,7 +206,7 @@ class SshMetricsCollector
 
         // Calculate used RAM: total - available
         $memUsed = $memTotal - $memAvailable;
-        
+
         // Convert to GB
         $ramUsageGb = $memUsed / (1024 * 1024 * 1024);
 
@@ -354,4 +354,3 @@ class SshMetricsCollector
         ];
     }
 }
-

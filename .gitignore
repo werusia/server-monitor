@@ -65,3 +65,7 @@ cypress/screenshots/
 cypress/videos/
 cypress/downloads/
 cypress.env.json
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###

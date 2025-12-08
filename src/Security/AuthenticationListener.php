@@ -73,7 +73,7 @@ class AuthenticationListener implements EventSubscriberInterface
         try {
             // Get session - Symfony will create it if it doesn't exist
             $session = $request->getSession();
-            
+
             // Start session if not already started
             if (!$session->isStarted()) {
                 $session->start();
@@ -104,4 +104,3 @@ class AuthenticationListener implements EventSubscriberInterface
         return true;
     }
 }
-

@@ -36,9 +36,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run PHP CS Fixer (dry-run)
-        uses: docker://oskarstark/php-cs-fixer-ga:3.26.0
-        with:
-          args: --dry-run --diff --verbose .
+        run: composer cs:check
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

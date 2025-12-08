@@ -176,4 +176,3 @@ class ServerMetric
         return $this;
     }
 }
-
