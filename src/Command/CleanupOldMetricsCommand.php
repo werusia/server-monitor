@@ -148,4 +148,3 @@ class CleanupOldMetricsCommand extends Command
         return $deleted;
     }
 }
-

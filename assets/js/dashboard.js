@@ -4,6 +4,7 @@
  */
 
 import { Chart, registerables } from 'chart.js';
+/* global bootstrap */
 
 // Register Chart.js components
 Chart.register(...registerables);

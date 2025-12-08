@@ -26,13 +26,17 @@ jobs:
           coverage: none
           tools: composer
 
+      # Create .env dynamically for jobs that need Symfony env
+      - name: Create .env file for tests
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_PASSWORD=.*/APP_PASSWORD=qwerty123/' .env
+
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run PHP CS Fixer (dry-run)
-        uses: docker://oskarstark/php-cs-fixer-ga:3.26.0
-        with:
-          args: --dry-run --diff --verbose
+        run: composer cs:check
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -54,6 +58,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -61,6 +66,12 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql
           coverage: xdebug
           tools: composer
+
+      # Create .env dynamically for jobs that need Symfony env
+      - name: Create .env file for tests
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_PASSWORD=.*/APP_PASSWORD=qwerty123/' .env
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -84,9 +95,41 @@ jobs:
     env:
       APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
       DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+      E2E_PASSWORD: ${{ secrets.APP_PASSWORD || secrets.DASHBOARD_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, pdo_sqlite
+          coverage: none
+          tools: composer
+
+      # Create .env dynamically for E2E, override DB to SQLite for CI
+      - name: Create .env for E2E
+        run: |
+          cp .env.example .env
+          sed -i "s/^APP_PASSWORD=.*/APP_PASSWORD=${E2E_PASSWORD:-qwerty123}/" .env
+          # Use local SQLite DB for CI E2E server
+          if grep -q '^DATABASE_URL=' .env; then sed -i 's#^DATABASE_URL=.*#DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"#' .env; else echo 'DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"' >> .env; fi
+          echo 'APP_ENV=test' >> .env
+          # Provide no-op Messenger transport for CI
+          echo 'MESSENGER_TRANSPORT_DSN=sync://' >> .env
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Initialize database (SQLite)
+        run: |
+          php bin/console doctrine:database:create --if-not-exists || true
+          if php bin/console list doctrine:migrations:migrate > /dev/null 2>&1; then \
+            php bin/console doctrine:migrations:migrate --no-interaction; \
+          else \
+            php bin/console doctrine:schema:update --force --no-interaction; \
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -97,17 +140,19 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
-      - name: Run Cypress E2E Tests
+      - name: Run Cypress E2E Tests (headless against local server)
         uses: cypress-io/github-action@v6
         with:
           install: false
-          wait-on: 'https://server-monitor.ddev.site:33003'
+          start: php -S 127.0.0.1:8080 -t public
+          wait-on: 'http://127.0.0.1:8080'
           wait-on-timeout: 120
           browser: chrome
           headless: true
-          env: |
-            APP_PASSWORD=${{ secrets.APP_PASSWORD || secrets.DASHBOARD_PASSWORD }}
-            DASHBOARD_PASSWORD=${{ secrets.DASHBOARD_PASSWORD || secrets.APP_PASSWORD }}
+        env:
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD || secrets.DASHBOARD_PASSWORD || 'qwerty123' }}
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD || secrets.APP_PASSWORD || 'qwerty123' }}
+          CYPRESS_baseUrl: 'http://127.0.0.1:8080'
 
       - name: Upload Cypress screenshots
         uses: actions/upload-artifact@v4

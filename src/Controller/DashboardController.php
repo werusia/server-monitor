@@ -27,7 +27,7 @@ class DashboardController extends AbstractController
         if ($this->isAuthenticated($request->getSession())) {
             return $this->redirect('/dashboard');
         }
-        
+
         return $this->redirect('/login');
     }
 
@@ -68,4 +68,3 @@ class DashboardController extends AbstractController
         return true;
     }
 }
-

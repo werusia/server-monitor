@@ -69,7 +69,7 @@ class LoginController extends AbstractController
             if (count($errors) > 0) {
                 $errorMessage = $errors[0]->getMessage();
             }
-            
+
             return $this->render('login/index.html.twig', [
                 'form' => $form->createView(),
                 'error' => $errorMessage ?? 'Wystąpił błąd walidacji formularza.',
@@ -99,7 +99,7 @@ class LoginController extends AbstractController
         // Set authenticated session
         $session->set(self::SESSION_AUTH_KEY, true);
         $session->set('auth_time', time());
-        
+
         // Ensure session is started and will be saved
         if (!$session->isStarted()) {
             $session->start();
@@ -132,4 +132,3 @@ class LoginController extends AbstractController
         return true;
     }
 }
-

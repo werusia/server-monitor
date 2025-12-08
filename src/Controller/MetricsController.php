@@ -178,4 +178,3 @@ class MetricsController extends AbstractController
         }
     }
 }
-

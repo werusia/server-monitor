@@ -8,7 +8,9 @@
     "test:e2e:open": "cypress open",
     "test:e2e:headless": "cypress run --headless",
     "test:e2e:chrome": "cypress run --browser chrome",
-    "test:e2e:firefox": "cypress run --browser firefox"
+    "test:e2e:firefox": "cypress run --browser firefox",
+    "lint": "eslint cypress/ assets/ --ext .js,.jsx",
+    "lint:fix": "eslint cypress/ assets/ --ext .js,.jsx --fix"
   },
   "devDependencies": {
     "cypress": "^13.7.0",

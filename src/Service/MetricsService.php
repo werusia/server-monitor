@@ -6,7 +6,6 @@ namespace App\Service;
 
 use App\Entity\ServerMetric;
 use App\Repository\ServerMetricRepository;
-use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * Service handling business logic for server metrics retrieval and aggregation.
@@ -339,4 +338,3 @@ class MetricsService
         return $metrics[count($metrics) - 1] ?? null;
     }
 }
-
