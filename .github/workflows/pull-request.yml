@@ -116,6 +116,8 @@ jobs:
           # Use local SQLite DB for CI E2E server
           if grep -q '^DATABASE_URL=' .env; then sed -i 's#^DATABASE_URL=.*#DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"#' .env; else echo 'DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"' >> .env; fi
           echo 'APP_ENV=test' >> .env
+          # Provide no-op Messenger transport for CI
+          echo 'MESSENGER_TRANSPORT_DSN=sync://' >> .env
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
