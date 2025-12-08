@@ -38,7 +38,7 @@ jobs:
       - name: Run PHP CS Fixer (dry-run)
         uses: docker://oskarstark/php-cs-fixer-ga:3.26.0
         with:
-          args: --dry-run --diff --verbose
+          args: --dry-run --diff --verbose .
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
