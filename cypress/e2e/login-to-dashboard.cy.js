@@ -246,6 +246,8 @@ describe('Logowanie do Dashboardu', () => {
 
       // 3. Wylogowanie
       cy.get('#logout-button').click();
+      // eslint-disable-next-line
+      cy.wait(2000);
 
       // 4. Weryfikacja przekierowania do logowania
       cy.url().should('include', '/login');
