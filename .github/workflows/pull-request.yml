@@ -26,6 +26,12 @@ jobs:
           coverage: none
           tools: composer
 
+      # Create .env dynamically for jobs that need Symfony env
+      - name: Create .env file for tests
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_PASSWORD=.*/APP_PASSWORD=qwerty123/' .env
+
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -54,6 +60,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -61,6 +68,12 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql
           coverage: xdebug
           tools: composer
+
+      # Create .env dynamically for jobs that need Symfony env
+      - name: Create .env file for tests
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_PASSWORD=.*/APP_PASSWORD=qwerty123/' .env
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
