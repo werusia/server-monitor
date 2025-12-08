@@ -248,16 +248,31 @@ describe('Logowanie do Dashboardu', () => {
       cy.get('#dashboard-header').should('be.visible');
       cy.get('#logout-button').should('be.visible');
 
-      // 3. Wylogowanie
-      cy.get('#logout-button').click();
-      // eslint-disable-next-line
-      cy.wait(2000);
+      // 3. Wylogowanie (robuste): przechwyć żądanie i poczekaj na odpowiedź
+      cy.intercept('POST', '/api/logout').as('logout');
+      // eslint-disable-next-line cypress/unsafe-to-chain-command
+      cy.get('#logout-button')
+        .scrollIntoView()
+        .should('be.visible');
+      // czasem element może być przykryty przez sticky header/tooltip w CI
+      cy.get('#logout-button').click({ force: true });
+
+      cy.wait('@logout').its('response.statusCode').should((status) => {
+        expect([200, 204, 302]).to.include(status);
+      });
 
       // 4. Weryfikacja przekierowania do logowania
-      cy.url().should('include', '/login');
+      cy.location('pathname', { timeout: 10000 }).should('include', '/login');
       cy.url().should('not.include', '/dashboard');
 
-      // 5. Próba ponownego dostępu do dashboardu bez logowania
+      // 5. Weryfikacja, że sesja została unieważniona (chroniony endpoint zwraca 401/403)
+      cy.request({ url: '/api/metrics/latest', failOnStatusCode: false })
+        .its('status')
+        .should((status) => {
+          expect([401, 403]).to.include(status);
+        });
+
+      // 6. Próba ponownego dostępu do dashboardu bez logowania
       cy.visit('/dashboard');
       cy.url().should('include', '/login');
     });
