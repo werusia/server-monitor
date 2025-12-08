@@ -79,8 +79,12 @@ describe('Logowanie do Dashboardu', () => {
       // Weryfikuj, że nie ma komunikatu błędu
       cy.get('#login-error').should('not.exist');
 
-      // Weryfikuj, że sesja jest ustawiona (sprawdź cookie)
-      cy.getCookie('PHPSESSID').should('exist');
+      // Zamiast sprawdzania ciasteczka PHPSESSID (HttpOnly, niedostępne dla JS w CI),
+      // weryfikujemy autoryzację żądaniem do chronionego endpointu API
+      cy.request({
+        url: '/api/metrics/latest',
+        failOnStatusCode: false,
+      }).its('status').should('eq', 200);
     });
 
     it('powinno wyświetlić dashboard z wykresami', () => {
